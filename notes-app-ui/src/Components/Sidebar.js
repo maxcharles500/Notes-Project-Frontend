@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { DropdownButton, Dropdown} from "react-bootstrap";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Folder from "./Folder";
 import Note from "./Note";
 
@@ -24,35 +24,46 @@ const Sidebar = ({
             <Dropdown.Item onClick={onAddNote}>File</Dropdown.Item>
           </DropdownButton>
         </div>
-        <div className="app-sidebar-notes">
-          {/* Folderless Notes */}
-          {notes.map(note => {
-            if (note.folder_id == null) {
-              return (
-                <Note 
-                  key={note.id}
-                  note={note}
-                  onDeleteNote={onDeleteNote}
-                  activeNote={activeNote}
-                  setActiveNote={setActiveNote}
-                />
-              )
-            }
-          })}
+        <DragDropContext>
+          <Droppable droppableId="app-sidebar-notes">
+            {(provided) => (
+              <div className="app-sidebar-notes" {...provided.droppableProps} ref={provided.innerRef}>
+                {/* Folderless Notes */}
+                {notes.map((note, i) => {
+                  if (note.folder_id == null) {
+                    return (
+                      <Draggable key={note.id} draggableId={note.id.toString()} index={i}>
+                        {(provided) => (
+                          <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                          <Note
+                            note={note}
+                            onDeleteNote={onDeleteNote}
+                            activeNote={activeNote}
+                            setActiveNote={setActiveNote}
+                          />
+                          </div>
+                        )}
+                      </Draggable>
+                    )
+                  }
+                })}
 
-          {/* Folders with Notes */}
-          {folders.map(folder => (
-            <Folder 
-              key={folder.id}
-              folder={folder}
-              notes={notes}
-              onDeleteNote={onDeleteNote}
-              activeNote={activeNote}
-              setActiveNote={setActiveNote}
-            />
-          ))}
-
-        </div>
+                {/* Folders with Notes */}
+                {folders.map(folder => (
+                  <Folder 
+                    key={folder.id}
+                    folder={folder}
+                    notes={notes}
+                    onDeleteNote={onDeleteNote}
+                    activeNote={activeNote}
+                    setActiveNote={setActiveNote}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
     );
   };
