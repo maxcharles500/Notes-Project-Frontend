@@ -18,10 +18,28 @@ function App() {
     .then(notes => setNotes(notes));
   }, []);
 
+  const onAddFolder = () => {
+    const newFolder = {
+      name: "New Folder"
+    };
+
+    fetch("http://localhost:9292/folders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newFolder)
+    })
+      .then(r => r.json())
+      .then(newFolder => {
+        setFolders([newFolder, ...folders]);
+      })
+  }
+
   const onAddNote = () => {
     const newNote = {
       title: "Untitled Note",
-      body: "",
+      body: ""
     };
 
     fetch("http://localhost:9292/notes", {
@@ -66,6 +84,7 @@ function App() {
     <div className="App">
       <Sidebar
         folders={folders}
+        onAddFolder={onAddFolder}
         notes={notes}
         onAddNote={onAddNote}
         onDeleteNote={onDeleteNote}
