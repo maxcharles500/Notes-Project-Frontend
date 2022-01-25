@@ -1,25 +1,46 @@
 import { useEffect, useState } from "react";
-import uuid from "react-uuid";
 import "./App.css";
 import Main from "./Components/Main";
 import Sidebar from "./Components/Sidebar";
 
 function App() {
+  const [folders, setFolders] = useState([]);
   const [notes, setNotes] = useState([]);
   const [activeNote, setActiveNote] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:9292/notes")
+    fetch("http://localhost:9292/folders")
     .then(r => r.json())
+    .then(folders => setFolders(folders));
+
+    fetch("http://localhost:9292/notes")
+    .then(r=> r.json())
     .then(notes => setNotes(notes));
   }, []);
+
+  const onAddFolder = () => {
+    const newFolder = {
+      name: "New Folder"
+    };
+
+    fetch("http://localhost:9292/folders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newFolder)
+    })
+      .then(r => r.json())
+      .then(newFolder => {
+        setFolders([newFolder, ...folders]);
+      })
+  }
 
   const onAddNote = () => {
     const newNote = {
       title: "Untitled Note",
-      body: "",
+      body: ""
     };
-    console.log(newNote)
 
     fetch("http://localhost:9292/notes", {
       method: "POST",
@@ -62,6 +83,8 @@ function App() {
   return (
     <div className="App">
       <Sidebar
+        folders={folders}
+        onAddFolder={onAddFolder}
         notes={notes}
         onAddNote={onAddNote}
         onDeleteNote={onDeleteNote}
