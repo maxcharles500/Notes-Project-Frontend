@@ -7,6 +7,17 @@ const Main = ({ activeNote, onUpdateNote }) => {
       [field]: value,
       lastModified: Date.now(),
     });
+
+    fetch(`http://localhost:9292/notes/${activeNote.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: activeNote.title,
+        body: activeNote.body
+      }),
+    })
   };
 
   if (!activeNote) return <div className="no-active-note">No Active Note</div>;

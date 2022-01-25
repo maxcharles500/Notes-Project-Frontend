@@ -5,28 +5,41 @@ import Main from "./Components/Main";
 import Sidebar from "./Components/Sidebar";
 
 function App() {
-  const [notes, setNotes] = useState(
-    localStorage.notes ? JSON.parse(localStorage.notes) : []
-  );
+  const [notes, setNotes] = useState([]);
   const [activeNote, setActiveNote] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  }, [notes]);
+    fetch("http://localhost:9292/notes")
+    .then(r => r.json())
+    .then(notes => setNotes(notes));
+  }, []);
 
   const onAddNote = () => {
     const newNote = {
-      id: uuid(),
       title: "Untitled Note",
       body: "",
-      lastModified: Date.now(),
     };
+    console.log(newNote)
 
-    setNotes([newNote, ...notes]);
-    setActiveNote(newNote.id);
+    fetch("http://localhost:9292/notes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newNote)
+    })
+      .then(r => r.json())
+      .then(newNote => {
+        setNotes([newNote, ...notes]);
+        setActiveNote(newNote.id);
+      })
   };
 
   const onDeleteNote = (noteId) => {
+    fetch(`http://localhost:9292/notes/${noteId}`, {
+      method: "DELETE",
+    });
+
     setNotes(notes.filter(({ id }) => id !== noteId));
   };
 
