@@ -65,8 +65,15 @@ button:hover {
   justify-content: space-between;
 }
 .app-sidebar-note button {
-  color: crimson;
+  background: none;
+  outline: none;
+  transition: .2s;
 }
+
+.app-sidebar-note button:hover {
+  transform: scale(1.2);
+}
+
 .app-sidebar-note p {
   margin: 10px 0;
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import uuid from "react-uuid";
 import "./App.css";
 import Main from "./Components/Main";
 import Sidebar from "./Components/Sidebar";
@@ -19,7 +18,6 @@ function App() {
       title: "Untitled Note",
       body: "",
     };
-    console.log(newNote)
 
     fetch("http://localhost:9292/notes", {
       method: "POST",

@@ -5,9 +5,10 @@ const Main = ({ activeNote, onUpdateNote }) => {
     onUpdateNote({
       ...activeNote,
       [field]: value,
-      lastModified: Date.now(),
+      // lastModified: Date.now(),
     });
-
+    console.log(activeNote)
+    
     fetch(`http://localhost:9292/notes/${activeNote.id}`, {
       method: "PATCH",
       headers: {
