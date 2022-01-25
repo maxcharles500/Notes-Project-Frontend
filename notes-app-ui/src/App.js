@@ -4,12 +4,17 @@ import Main from "./Components/Main";
 import Sidebar from "./Components/Sidebar";
 
 function App() {
+  const [folders, setFolders] = useState([]);
   const [notes, setNotes] = useState([]);
   const [activeNote, setActiveNote] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:9292/notes")
+    fetch("http://localhost:9292/folders")
     .then(r => r.json())
+    .then(folders => setFolders(folders));
+
+    fetch("http://localhost:9292/notes")
+    .then(r=> r.json())
     .then(notes => setNotes(notes));
   }, []);
 
@@ -60,6 +65,7 @@ function App() {
   return (
     <div className="App">
       <Sidebar
+        folders={folders}
         notes={notes}
         onAddNote={onAddNote}
         onDeleteNote={onDeleteNote}

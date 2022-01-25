@@ -1,7 +1,7 @@
 import Folder from "./Folder";
 
-
 const Sidebar = ({
+    folders,
     notes,
     onAddNote,
     onDeleteNote,
@@ -18,13 +18,16 @@ const Sidebar = ({
           <button onClick={onAddNote}>Add</button>
         </div>
         <div className="app-sidebar-notes">
-          <Folder 
-            notes={notes}
-            onDeleteNote={onDeleteNote}
-            activeNote={activeNote}
-            setActiveNote={setActiveNote}
-          />
-
+          {folders.map(folder => (
+            <Folder 
+              key={folder.id}
+              folder={folder}
+              notes={notes}
+              onDeleteNote={onDeleteNote}
+              activeNote={activeNote}
+              setActiveNote={setActiveNote}
+            />
+          ))}
         </div>
       </div>
     );
