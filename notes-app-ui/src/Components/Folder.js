@@ -15,23 +15,21 @@ const Folder = ({
     onAddNote
 }) => {
   const onEditFolder = (e) => {
-    console.log('e' , e.target.value)
-        fetch(`http://localhost:9292/folders/${folder.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-          name: e.target.value
-          }),
-        })
-        onUpdateFolder({
-            ...folder,
-            name: e.target.value
-        })
-    }
-	// const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
-	// console.log(sortedNotes)
+		fetch(`http://localhost:9292/folders/${folder.id}`, {
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+			name: e.target.value
+			}),
+		})
+		onUpdateFolder({
+			...folder,
+			name: e.target.value
+		})
+	}
+
 	return (
 		<Accordion defaultActiveKey="0">
 		<Accordion.Item>
