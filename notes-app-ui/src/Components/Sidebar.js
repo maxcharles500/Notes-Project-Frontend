@@ -1,5 +1,5 @@
 import { DropdownButton, Dropdown} from "react-bootstrap";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { DragDropContext } from "react-beautiful-dnd";
 import Folder from "./Folder";
 
 const Sidebar = ({
@@ -18,20 +18,21 @@ const Sidebar = ({
     const handleOnDragEnd = (result) => {
       // Return if out of bounds
       if (!result.destination) return;
-      const { source, destination, draggableId } = result;
-      // Handle if moving note to new folder
-      if (source.droppableId !== destination.droppableId) {
+      const { destination, draggableId } = result;
+      // Removed conditionnal logic to organize notes based on updated_at // if (source.droppableId !== destination.droppableId) {
+
         // Update note within notes array with new folder ID
         const updatedNotesArr = notes.map((note) => {
-          if (note.id == draggableId) {
+          if (note.id === parseInt(draggableId)) {
             return ({
               ...note,
-              folder_id: parseInt(destination.droppableId)
+              folder_id: parseInt(destination.droppableId),
+              updated_at: Date.now()
             })
           }
-    
           return note;
         });
+        
         fetch(`http://localhost:9292/folders/notes/${draggableId}`, {
           method: "PATCH",
           headers: {
@@ -42,7 +43,7 @@ const Sidebar = ({
           }),
         })
         setNotes(updatedNotesArr);
-      }
+      // }
     }
 
     return (
@@ -59,22 +60,18 @@ const Sidebar = ({
         <DragDropContext onDragEnd={handleOnDragEnd}>
           {/* Folders with Notes */}
           {folders.map((folder, i) => (
-            <Droppable key={folder.id} droppableId={folder.id.toString()} index={i}>
-            {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
                 <Folder 
-                onAddNote={onAddNote}
+                  key={folder.id}
+                  i={i}
                   folder={folder}
                   onUpdateFolder={onUpdateFolder}
                   notes={notes}
+                  onAddNote={onAddNote}
+                  setNotes={setNotes}
                   onDeleteNote={onDeleteNote}
                   activeNote={activeNote}
                   setActiveNote={setActiveNote}
                 />
-                {provided.placeholder}
-              </div>
-            )}
-            </Droppable>
           ))}
         </DragDropContext>
         </div>

@@ -9,8 +9,10 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [activeNote, setActiveNote] = useState(false);
 
+  const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
+
   useEffect(() => {
-    fetch("http://localhost:9292/folders")
+    fetch("http://localhost:9292/folders/recent")
     .then(r => r.json())
     .then(folders => setFolders(folders));
 
@@ -19,6 +21,7 @@ function App() {
     .then(notes => setNotes(notes));
   }, []);
 
+// CRUD //
   const onAddFolder = () => {
     const newFolder = {
       name: "New Folder"
@@ -95,8 +98,8 @@ function App() {
     return notes.find(({ id }) => id === activeNote);
   };
 
-  
 
+// APP //
   return (
     
     <div className="App">
@@ -105,7 +108,8 @@ function App() {
         folders={folders}
         onUpdateFolder={onUpdateFolder}
         onAddFolder={onAddFolder}
-        notes={notes}
+        notes={sortedNotes}
+        setNotes={setNotes}
         onAddNote={onAddNote}
         onDeleteNote={onDeleteNote}
         activeNote={activeNote}
