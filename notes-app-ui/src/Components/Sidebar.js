@@ -4,6 +4,7 @@ import Folder from "./Folder";
 
 const Sidebar = ({
     folders,
+    onUpdateFolder,
     onAddFolder,
     notes,
     setNotes,
@@ -11,6 +12,7 @@ const Sidebar = ({
     onDeleteNote,
     activeNote,
     setActiveNote,
+
   }) => {
     // DND HANDLER
     const handleOnDragEnd = (result) => {
@@ -62,7 +64,9 @@ const Sidebar = ({
                   key={folder.id}
                   i={i}
                   folder={folder}
+                  onUpdateFolder={onUpdateFolder}
                   notes={notes}
+                  onAddNote={onAddNote}
                   setNotes={setNotes}
                   onDeleteNote={onDeleteNote}
                   activeNote={activeNote}

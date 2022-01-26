@@ -16,6 +16,10 @@ const Main = ({ activeNote, onUpdateNote }) => {
       },
       body: JSON.stringify(updatedNote),
     })
+    onUpdateNote({
+      ...activeNote,
+      [field]: value
+    });
   };
 
   if (!activeNote) return <div className="no-active-note">No Active Note</div>;

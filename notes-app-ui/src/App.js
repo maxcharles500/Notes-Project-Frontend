@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import Main from "./Components/Main";
 import Sidebar from "./Components/Sidebar";
+import {DragDropContext} from 'react-beautiful-dnd';
 
 function App() {
   const [folders, setFolders] = useState([]);
@@ -39,11 +40,12 @@ function App() {
       })
   }
 
-  const onAddNote = () => {
+  const onAddNote = (e) => {
+    
     const newNote = {
       title: "Untitled Note",
       body: "",
-      folder_id: 1
+      folder_id: e.target.id
     };
 
     fetch("http://localhost:9292/notes", {
@@ -80,15 +82,31 @@ function App() {
     setNotes(updatedNotesArr);
   };
 
+  const onUpdateFolder = (updatedFolder) => {
+    const updatedFoldersArr = folders.map((folder) => {
+      if (folder.id === updatedFolder.id) {
+        return updatedFolder;
+      }
+
+      return folder;
+    });
+
+    setFolders(updatedFoldersArr);
+  };
+
   const getActiveNote = () => {
     return notes.find(({ id }) => id === activeNote);
   };
 
+
 // APP //
   return (
+    
     <div className="App">
+    <DragDropContext>
       <Sidebar
         folders={folders}
+        onUpdateFolder={onUpdateFolder}
         onAddFolder={onAddFolder}
         notes={sortedNotes}
         setNotes={setNotes}
@@ -96,9 +114,12 @@ function App() {
         onDeleteNote={onDeleteNote}
         activeNote={activeNote}
         setActiveNote={setActiveNote}
+        
       />
       <Main activeNote={getActiveNote()} onUpdateNote={onUpdateNote} />
+      </DragDropContext>
     </div>
+    
   );
 }
 
