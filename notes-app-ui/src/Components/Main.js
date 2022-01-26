@@ -2,20 +2,20 @@ import ReactMarkdown from "react-markdown";
 
 const Main = ({ activeNote, onUpdateNote }) => {
   const onEditField = (field, value) => {
+    const updatedNote = {
+      ...activeNote,
+      [field]: value,
+      updated_at: Date.now()
+    }
+    onUpdateNote(updatedNote);
+
     fetch(`http://localhost:9292/notes/${activeNote.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        title: activeNote.title,
-        body: activeNote.body
-      }),
+      body: JSON.stringify(updatedNote),
     })
-    onUpdateNote({
-      ...activeNote,
-      [field]: value
-    });
   };
 
   if (!activeNote) return <div className="no-active-note">No Active Note</div>;

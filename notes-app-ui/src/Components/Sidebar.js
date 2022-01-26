@@ -30,7 +30,7 @@ const Sidebar = ({
     
           return note;
         });
-        fetch(`http://localhost:9292/folders/notes/${draggableId}`, {
+        fetch(`http://localhost:9292/notes/${draggableId}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
