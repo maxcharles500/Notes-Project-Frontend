@@ -14,7 +14,11 @@ const Sidebar = ({
   }) => {
       // LEGACY: SORTING MOVED TO SERVER
       // const sortedNotes = notes.sort((a, b) => b.updatedAt - a.updatedAt);
-    
+    const handleOnDragEnd = (result, folders) => {
+      console.log(folders)
+      if (!result.destination) return;
+    }
+
     return (
       <div className="app-sidebar">
         <div className="app-sidebar-header">
@@ -24,10 +28,11 @@ const Sidebar = ({
             <Dropdown.Item onClick={onAddNote}>File</Dropdown.Item>
           </DropdownButton>
         </div>
-        <DragDropContext>
+        <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="app-sidebar-notes">
             {(provided) => (
               <div className="app-sidebar-notes" {...provided.droppableProps} ref={provided.innerRef}>
+
                 {/* Folderless Notes */}
                 {notes.map((note, i) => {
                   if (note.folder_id == null) {
@@ -35,12 +40,13 @@ const Sidebar = ({
                       <Draggable key={note.id} draggableId={note.id.toString()} index={i}>
                         {(provided) => (
                           <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                          <Note
-                            note={note}
-                            onDeleteNote={onDeleteNote}
-                            activeNote={activeNote}
-                            setActiveNote={setActiveNote}
-                          />
+                            <Note
+                              note={note}
+                              onDeleteNote={onDeleteNote}
+                              activeNote={activeNote}
+                              setActiveNote={setActiveNote}
+                            />
+                            {/* {provided.placeholder} */}
                           </div>
                         )}
                       </Draggable>
@@ -49,7 +55,7 @@ const Sidebar = ({
                 })}
 
                 {/* Folders with Notes */}
-                {folders.map(folder => (
+                {folders.map((folder, i) => (
                   <Folder 
                     key={folder.id}
                     folder={folder}
@@ -59,6 +65,7 @@ const Sidebar = ({
                     setActiveNote={setActiveNote}
                   />
                 ))}
+
                 {provided.placeholder}
               </div>
             )}
