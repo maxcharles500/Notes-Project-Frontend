@@ -41,7 +41,6 @@ function App() {
   }
 
   const onAddNote = (e) => {
-    
     const newNote = {
       title: "Untitled Note",
       body: "",
@@ -75,7 +74,6 @@ function App() {
       if (note.id === updatedNote.id) {
         return updatedNote;
       }
-
       return note;
     });
 
@@ -87,7 +85,6 @@ function App() {
       if (folder.id === updatedFolder.id) {
         return updatedFolder;
       }
-
       return folder;
     });
 
