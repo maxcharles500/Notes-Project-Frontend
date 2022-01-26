@@ -28,6 +28,7 @@ const Note = ({
 				🗑️
 			</button>
 
+			{/* Delete Modal */}
 			<Modal show={show} onHide={handleClose}>
 				<Modal.Header closeButton>
 				<Modal.Title>{note.title}</Modal.Title>
