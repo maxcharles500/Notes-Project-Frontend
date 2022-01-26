@@ -18,6 +18,7 @@ function App() {
     .then(notes => setNotes(notes));
   }, []);
 
+// CRUD //
   const onAddFolder = () => {
     const newFolder = {
       name: "New Folder"
@@ -39,7 +40,8 @@ function App() {
   const onAddNote = () => {
     const newNote = {
       title: "Untitled Note",
-      body: ""
+      body: "",
+      folder_id: 1
     };
 
     fetch("http://localhost:9292/notes", {
@@ -80,12 +82,14 @@ function App() {
     return notes.find(({ id }) => id === activeNote);
   };
 
+// APP //
   return (
     <div className="App">
       <Sidebar
         folders={folders}
         onAddFolder={onAddFolder}
         notes={notes}
+        setNotes={setNotes}
         onAddNote={onAddNote}
         onDeleteNote={onDeleteNote}
         activeNote={activeNote}

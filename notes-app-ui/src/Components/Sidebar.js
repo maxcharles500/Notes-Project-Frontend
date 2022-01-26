@@ -1,20 +1,48 @@
-import { useState } from 'react';
 import { DropdownButton, Dropdown} from "react-bootstrap";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import Folder from "./Folder";
-import Note from "./Note";
 
 const Sidebar = ({
     folders,
     onAddFolder,
     notes,
+    setNotes,
     onAddNote,
     onDeleteNote,
     activeNote,
     setActiveNote,
   }) => {
-      // LEGACY: SORTING MOVED TO SERVER
-      // const sortedNotes = notes.sort((a, b) => b.updatedAt - a.updatedAt);
+    // DND HANDLER
+    const handleOnDragEnd = (result) => {
+      // Return if out of bounds
+      if (!result.destination) return;
+      const { source, destination, draggableId } = result;
+      // Handle if moving note to new folder
+      if (source.droppableId !== destination.droppableId) {
+        // Update note within notes array with new folder ID
+        const updatedNotesArr = notes.map((note) => {
+          if (note.id == draggableId) {
+            return ({
+              ...note,
+              folder_id: parseInt(destination.droppableId)
+            })
+          }
     
+          return note;
+        });
+        fetch(`http://localhost:9292/folders/notes/${draggableId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            folder_id: destination.droppableId
+          }),
+        })
+        setNotes(updatedNotesArr);
+      }
+    }
+
     return (
       <div className="app-sidebar">
         <div className="app-sidebar-header">
@@ -24,34 +52,27 @@ const Sidebar = ({
             <Dropdown.Item onClick={onAddNote}>File</Dropdown.Item>
           </DropdownButton>
         </div>
+
         <div className="app-sidebar-notes">
-          {/* Folderless Notes */}
-          {notes.map(note => {
-            if (note.folder_id == null) {
-              return (
-                <Note 
-                  key={note.id}
-                  note={note}
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          {/* Folders with Notes */}
+          {folders.map((folder, i) => (
+            <Droppable key={folder.id} droppableId={folder.id.toString()} index={i}>
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                <Folder 
+                  folder={folder}
+                  notes={notes}
                   onDeleteNote={onDeleteNote}
                   activeNote={activeNote}
                   setActiveNote={setActiveNote}
                 />
-              )
-            }
-          })}
-
-          {/* Folders with Notes */}
-          {folders.map(folder => (
-            <Folder 
-              key={folder.id}
-              folder={folder}
-              notes={notes}
-              onDeleteNote={onDeleteNote}
-              activeNote={activeNote}
-              setActiveNote={setActiveNote}
-            />
+                {provided.placeholder}
+              </div>
+            )}
+            </Droppable>
           ))}
-
+        </DragDropContext>
         </div>
       </div>
     );
