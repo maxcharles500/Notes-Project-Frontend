@@ -15,6 +15,7 @@ const Sidebar = ({
   activeNote,
   setActiveNote,
 }) => {
+  const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
 
   // DND HANDLER
   const handleOnDragEnd = (result) => {
@@ -25,10 +26,10 @@ const Sidebar = ({
 
       // Update note within notes array with new folder ID
       const updatedNotesArr = notes.map((note) => {
-        if (note.id === parseInt(draggableId)) {
+        if (note.id === draggableId) {
           return ({
             ...note,
-            folder_id: parseInt(destination.droppableId),
+            folder_id: destination.droppableId,
             updated_at: Date.now()
           })
         }
@@ -68,7 +69,7 @@ const Sidebar = ({
                 folder={folder}
                 onUpdateFolder={onUpdateFolder}
                 onDeleteFolder={onDeleteFolder}
-                notes={notes}
+                notes={sortedNotes}
                 onAddNote={onAddNote}
                 setNotes={setNotes}
                 onDeleteNote={onDeleteNote}
