@@ -17,6 +17,7 @@ const Folder = ({
 	setActiveNote,
 	onAddNote
 }) => {
+	const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
 	// Delete Modal
 	const [showModal, setShowModal] = useState(false);
 	const handleCloseModal = () => setShowModal(false);
@@ -97,7 +98,7 @@ const Folder = ({
 				</ul>
 			</ContextMenu>
 		)}
-			<Droppable key={folder.id} droppableId={folder.id.toString()} index={i}>
+			<Droppable key={folder.id} droppableId={folder.id} index={i}>
 			{(provided, snapshot) => (
 				// Droppable div
 				<div 
@@ -106,10 +107,10 @@ const Folder = ({
 					{...provided.droppableProps}
 				>
 					<Accordion.Body>
-						{notes.map((note, i) => {
+						{sortedNotes.map((note, i) => {
 							if (note.folder_id == folder.id) {
 								return (
-									<Draggable key={note.id} draggableId={note.id.toString()} index={i}>
+									<Draggable key={note.id} draggableId={note.id} index={i}>
 										{(provided) => (
 											// Draggable div
 											<div 
