@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import {DragDropContext} from 'react-beautiful-dnd';
 import "./App.css";
 import Main from "./Components/Main";
 import Sidebar from "./Components/Sidebar";
-import {DragDropContext} from 'react-beautiful-dnd';
+
 
 function App() {
   const [folders, setFolders] = useState([]);
@@ -11,6 +12,7 @@ function App() {
 
   const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
 
+// INITIALIZE FETCH //
   useEffect(() => {
     fetch("http://localhost:9292/folders/recent")
     .then(r => r.json())
@@ -21,12 +23,12 @@ function App() {
     .then(notes => setNotes(notes));
   }, []);
 
-// CRUD //
+
+// POST //
   const onAddFolder = () => {
     const newFolder = {
       name: "New Folder"
     };
-
     fetch("http://localhost:9292/folders", {
       method: "POST",
       headers: {
@@ -40,13 +42,12 @@ function App() {
       })
   }
 
-  const onAddNote = (e) => {
+  const onAddNote = (folder) => {
     const newNote = {
       title: "Untitled Note",
       body: "",
-      folder_id: e.target.id
+      folder_id: folder
     };
-
     fetch("http://localhost:9292/notes", {
       method: "POST",
       headers: {
@@ -61,12 +62,15 @@ function App() {
       })
   };
 
-  const onDeleteNote = (noteId) => {
-    fetch(`http://localhost:9292/notes/${noteId}`, {
-      method: "DELETE",
+// PATCH //
+  const onUpdateFolder = (updatedFolder) => {
+    const updatedFoldersArr = folders.map((folder) => {
+      if (folder.id === updatedFolder.id) {
+        return updatedFolder;
+      }
+      return folder;
     });
-
-    setNotes(notes.filter(({ id }) => id !== noteId));
+    setFolders(updatedFoldersArr);
   };
 
   const onUpdateNote = (updatedNote) => {
@@ -76,19 +80,22 @@ function App() {
       }
       return note;
     });
-
     setNotes(updatedNotesArr);
   };
 
-  const onUpdateFolder = (updatedFolder) => {
-    const updatedFoldersArr = folders.map((folder) => {
-      if (folder.id === updatedFolder.id) {
-        return updatedFolder;
-      }
-      return folder;
+// DELETE //
+  const onDeleteFolder = (folderId) => {
+    fetch(`http://localhost:9292/folders/notes/${folderId}`, {
+      method: "DELETE",
     });
+    setFolders(folders.filter(({ id }) => id !== folderId));
+  };
 
-    setFolders(updatedFoldersArr);
+  const onDeleteNote = (noteId) => {
+    fetch(`http://localhost:9292/notes/${noteId}`, {
+      method: "DELETE",
+    });
+    setNotes(notes.filter(({ id }) => id !== noteId));
   };
 
   const getActiveNote = () => {
@@ -103,8 +110,9 @@ function App() {
     <DragDropContext>
       <Sidebar
         folders={folders}
-        onUpdateFolder={onUpdateFolder}
         onAddFolder={onAddFolder}
+        onUpdateFolder={onUpdateFolder}
+        onDeleteFolder={onDeleteFolder}
         notes={sortedNotes}
         setNotes={setNotes}
         onAddNote={onAddNote}
