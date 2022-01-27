@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {DragDropContext} from 'react-beautiful-dnd';
 import "./App.css";
+import uuid from "react-uuid";
 import Main from "./Components/Main";
 import Sidebar from "./Components/Sidebar";
 
@@ -27,6 +28,7 @@ function App() {
 // POST //
   const onAddFolder = () => {
     const newFolder = {
+      id: uuid(),
       name: "New Folder"
     };
     fetch("http://localhost:9292/folders", {
@@ -44,6 +46,7 @@ function App() {
 
   const onAddNote = (folder) => {
     const newNote = {
+      id: uuid(),
       title: "Untitled Note",
       body: "",
       folder_id: folder
