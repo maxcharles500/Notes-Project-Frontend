@@ -7,14 +7,12 @@ const Note = ({
 	activeNote, 
 	setActiveNote 
 }) => {
-	const [show, setShow] = useState(false);
-
-	const handleClose = () => setShow(false);
-	const handleShow = () => setShow(true);
-
+	const [showModal, setShowModal] = useState(false);
+	const handleCloseModal = () => setShowModal(false);
+	const handleShowModal = () => setShowModal(true);
 	const handleDelete = () => {
 		onDeleteNote(note.id)
-		handleClose()
+		handleCloseModal()
 	}
     
 	return (
@@ -24,25 +22,9 @@ const Note = ({
 		>
 		<div className="sidebar-note-title">
 			<strong>{note.title}</strong>
-			<button onClick={handleShow}>
+			<button onClick={handleShowModal}>
 				🗑️
 			</button>
-
-			{/* Delete Modal */}
-			<Modal show={show} onHide={handleClose}>
-				<Modal.Header closeButton>
-				<Modal.Title>{note.title}</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>Are you sure you want to delete {note.title}?</Modal.Body>
-				<Modal.Footer>
-				<Button variant="secondary" onClick={handleClose}>
-						No, I regret everything!
-				</Button>
-				<Button variant="danger" onClick={handleDelete}>
-						Delete
-				</Button>
-				</Modal.Footer>
-			</Modal>
 			</div>
 
 			<p>{note.body && note.body.substr(0, 100) + "..."}</p>
@@ -53,6 +35,22 @@ const Note = ({
 					minute: "2-digit",
 				})}
 			</small>
+
+			{/* Delete Modal */}
+			<Modal show={showModal} onHide={handleCloseModal}>
+				<Modal.Header closeButton>
+				<Modal.Title>{note.title}</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>Are you sure you want to delete {note.title}?</Modal.Body>
+				<Modal.Footer>
+				<Button variant="secondary" onClick={handleCloseModal}>
+						No, take me back!
+				</Button>
+				<Button variant="danger" onClick={handleDelete}>
+						Delete
+				</Button>
+				</Modal.Footer>
+			</Modal>
 		</div>
 	)
 }
