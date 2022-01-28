@@ -13,12 +13,15 @@ function App() {
   const [connectionError, setConnectionError] = useState(false);
 
   const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
+  const loadError = "Failed to connect to the server. Please check if the server is running."
+  const serverError = "Connection to server failed. Changes will not be saved."
 
 // INITIALIZE FETCH //
   useEffect(() => {
     fetch("http://localhost:9292/folders")
     .then(r => r.json())
-    .then(folders => setFolders(folders));
+    .then(folders => setFolders(folders))
+    .catch(err => setConnectionError(loadError))
 
     fetch("http://localhost:9292/notes/all/tags")
     .then(r => r.json())
@@ -50,7 +53,7 @@ function App() {
         setFolders([newFolder, ...folders]);
         setConnectionError(false);
       })
-      .catch(err => {setConnectionError(true)})
+      .catch(err => {setConnectionError(serverError)});
   }
 
   const onAddNote = (folder) => {
@@ -77,7 +80,7 @@ function App() {
         setActiveNote(newNote.id);
         setConnectionError(false);
       })
-      .catch(err => {setConnectionError(true)})
+      .catch(err => {setConnectionError(serverError)});
   };
 
 // PATCH //
@@ -90,7 +93,7 @@ function App() {
 			body: JSON.stringify(updatedFolder),
 		})
     .then(r => {setConnectionError(false)})
-    .catch(err => {setConnectionError(true)})
+    .catch(err => {setConnectionError(serverError)})
     const updatedFoldersArr = folders.map((folder) => {
       if (folder.id === updatedFolder.id) {
         return updatedFolder;
@@ -109,7 +112,7 @@ function App() {
       body: JSON.stringify(updatedNote),
     })
     .then(r => {setConnectionError(false)})
-    .catch(err => {setConnectionError(true)})
+    .catch(err => {setConnectionError(serverError)});
     const updatedNotesArr = notes.map((note) => {
       if (note.id === updatedNote.id) {
         return updatedNote;
@@ -141,7 +144,7 @@ function App() {
         body: JSON.stringify(existingTag)
       })
       .then(r => {setConnectionError(false)})
-      .catch(err => {setConnectionError(true)})
+      .catch(err => {setConnectionError(serverError)});
       setNotes(updatedNotesArr)
       setTags([...tags, existingTag])
     }
@@ -165,7 +168,7 @@ function App() {
         body: JSON.stringify(newTag)
       })
       .then(r => {setConnectionError(false)})
-      .catch(err => {setConnectionError(true)})
+      .catch(err => {setConnectionError(serverError)});
       setNotes(updatedNotesArr)
       setTags([...tags, newTag])
     }
@@ -180,7 +183,7 @@ function App() {
       body: JSON.stringify(tag)
     })
     .then(r => {setConnectionError(false)})
-    .catch(err => {setConnectionError(true)})
+    .catch(err => {setConnectionError(serverError)});
     const updatedNotesArr = [...notes]
     updatedNotesArr.forEach(note => {
       note.tags = note.tags.filter(t => t !== tag)
@@ -193,18 +196,22 @@ function App() {
     fetch(`http://localhost:9292/folders/notes/${folderId}`, {
       method: "DELETE",
     })
-    .then(r => {setConnectionError(false)})
-    .catch(err => {setConnectionError(true)})
-    setFolders(folders.filter(({ id }) => id !== folderId));
+    .then(r => {
+      setFolders(folders.filter(({ id }) => id !== folderId));
+      setConnectionError(false);
+    })
+    .catch(err => {setConnectionError(serverError)});
   };
 
   const onDeleteNote = (noteId) => {
     fetch(`http://localhost:9292/notes/${noteId}`, {
       method: "DELETE",
     })
-    .then(r => {setConnectionError(false)})
-    .catch(err => {setConnectionError(true)})
-    setNotes(notes.filter(({ id }) => id !== noteId));
+    .then(r => {
+      setNotes(notes.filter(({ id }) => id !== noteId));
+      setConnectionError(false);
+    })
+    .catch(err => {setConnectionError(serverError)});
   };
 
   const getActiveNote = () => {
