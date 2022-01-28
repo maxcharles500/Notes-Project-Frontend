@@ -1,12 +1,16 @@
-import { useState } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { ContextMenu } from "../Styles/styles";
+import { Modal, Button, Badge } from "react-bootstrap";
 
 const Note = ({ 
 	note, 
 	onDeleteNote, 
 	activeNote, 
-	setActiveNote 
+	setActiveNote,
+	onAddTag,
+	onRemoveTag
 }) => {
+	// Delete Modal
 	const [showModal, setShowModal] = useState(false);
 	const handleCloseModal = () => setShowModal(false);
 	const handleShowModal = () => setShowModal(true);
@@ -14,28 +18,76 @@ const Note = ({
 		onDeleteNote(note.id)
 		handleCloseModal()
 	}
+
+	// Tags Modal
+	const [tagForm, setTagForm] = useState("");
+	const [showTagsModal, setShowTagsModal] = useState(false);
+	const handleCloseTagsModal = () => setShowTagsModal(false);
+	const handleShowTagsModal = () => setShowTagsModal(true);
+	const handleTagAdd = (e) => {
+		e.preventDefault();
+		setTagForm("");
+		onAddTag(note, tagForm);
+	}
+	const handleTagRemove = (e) => {
+		const removedTag = note.tags.find(tag => tag.id === e.target.id)
+		onRemoveTag(note, removedTag)
+	}
+
+	const noteTags = note.tags.map(tag => tag)
+
+	// Context Menu
+	const [showMenu, setShowMenu] = useState(false);
+	const [points, setPoints] = useState({ x: 0, y: 0});
+
+	// Context Menu browser click to hide
+	useEffect(() => {
+		const handleClick = () => setShowMenu(false);
+		window.addEventListener('click', handleClick);
+		return () => window.removeEventListener('click', handleClick);
+	}, []);
     
 	return (
-		<div
-			className={`app-sidebar-note ${note.id === activeNote && "active"}`}
-			onClick={() => setActiveNote(note.id)}
-		>
-		<div className="sidebar-note-title">
-			<strong>{note.title}</strong>
-			<button onClick={handleShowModal}>
-				🗑️
-			</button>
+		<div>
+			{/* Context Menu Div */}
+			<div
+				onContextMenu={e => {
+					e.preventDefault();
+					setShowMenu(true);
+					setPoints({ x: e.pageX, y: e.pageY });
+				}}
+			>
+			<div
+				className={`app-sidebar-note ${note.id === activeNote && "active"}`}
+				onClick={() => setActiveNote(note.id)}
+			>
+
+			<div className="sidebar-note-title">
+				<strong>{note.title}</strong>
+				<button onClick={handleShowModal}>
+					🗑️
+				</button>
+				</div>
+
+				<p>{note.body && note.body.substr(0, 100) + "..."}</p>
+				<small className="note-meta">
+					Last Modified{" "}
+					{new Date(note.updated_at).toLocaleDateString("en-GB", {
+						hour: "2-digit",
+						minute: "2-digit",
+					})}
+				</small>
 			</div>
-
-			<p>{note.body && note.body.substr(0, 100) + "..."}</p>
-			<small className="note-meta">
-				Last Modified{" "}
-				{new Date(note.updated_at).toLocaleDateString("en-GB", {
-					hour: "2-digit",
-					minute: "2-digit",
-				})}
-			</small>
-
+			</div>
+			{/* Render Context Menu when showMenu is true */}
+			{showMenu && (
+				<ContextMenu top={points.y} left={points.x}>
+					<ul>
+						<li onClick={handleShowTagsModal}>Manage Tags</li>
+						<li >Delete</li>
+					</ul>
+				</ContextMenu>
+			)}
 			{/* Delete Modal */}
 			<Modal show={showModal} onHide={handleCloseModal}>
 				<Modal.Header closeButton>
@@ -48,6 +100,27 @@ const Note = ({
 				</Button>
 				<Button variant="danger" onClick={handleDelete}>
 						Delete
+				</Button>
+				</Modal.Footer>
+			</Modal>
+
+			{/* Tags Modal */}
+			<Modal show={showTagsModal} onHide={handleCloseTagsModal}>
+				<Modal.Header closeButton>
+				<Modal.Title>Tags in {note.title}</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					{/* Note Tags */}
+					{noteTags.map(({id, name}) => (
+          	<Badge key={id} id={id} bg="info" as="button" onClick={(e) => handleTagRemove(e)}>{name} X</Badge>
+        	))}
+					<form onSubmit={(e) => handleTagAdd(e)}>
+						<input type="text" placeholder="New Tags" value={tagForm} onChange={(e) => setTagForm(e.target.value)}/>
+					</form>
+				</Modal.Body>
+				<Modal.Footer>
+				<Button variant="primary" onClick={handleCloseTagsModal}>
+						Done
 				</Button>
 				</Modal.Footer>
 			</Modal>

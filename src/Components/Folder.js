@@ -15,16 +15,19 @@ const Folder = ({
 	onDeleteNote,
 	activeNote,
 	setActiveNote,
-	onAddNote
+	onAddNote,
+	onAddTag,
+	onRemoveTag
 }) => {
 	const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
 	// Delete Modal
 	const [showModal, setShowModal] = useState(false);
 	const handleCloseModal = () => setShowModal(false);
 	const handleShowModal = () => setShowModal(true);
-	const handleDelete = () => {
-		onDeleteFolder(folder.id)
-		handleCloseModal()
+	const handleDelete = (e) => {
+		e.preventDefault();
+		onDeleteFolder(folder.id);
+		handleCloseModal();
 	}
 
 	// Context Menu
@@ -123,6 +126,8 @@ const Folder = ({
 													onDeleteNote={onDeleteNote}
 													activeNote={activeNote}
 													setActiveNote={setActiveNote}
+													onAddTag={onAddTag}
+													onRemoveTag={onRemoveTag}
 												/>
 											</div>
 										)}
@@ -148,7 +153,7 @@ const Folder = ({
 			<Button variant="secondary" onClick={handleCloseModal}>
 					No, I regret everything!
 			</Button>
-			<Button variant="danger" onClick={handleDelete}>
+			<Button variant="danger" onClick={(e) => handleDelete(e)}>
 					Delete
 			</Button>
 			</Modal.Footer>

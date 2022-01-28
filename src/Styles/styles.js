@@ -6,6 +6,7 @@ export const ContextMenu = styled.div`
   box-sizing: border-box;
   position: absolute;
   width: 200px;
+  color: black;
   background-color: white;
   box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.1);
   ${({ top, left }) => css`
@@ -24,6 +25,6 @@ export const ContextMenu = styled.div`
   }
   ul li:hover {
     cursor: pointer;
-    background-color: blue;
+    background-color: lightblue;
   }
 `;
