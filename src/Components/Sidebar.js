@@ -66,7 +66,7 @@ const Sidebar = ({
       {/* Display Connection Error Message */}
       {connectionError ?
         <div className="app-sidebar-error">
-          <p style={{text: 'red'}}>Connection to server failed. Changes will not be saved.</p>
+          <p style={{text: 'red'}}>{connectionError}</p>
         </div> :
         null
       }
