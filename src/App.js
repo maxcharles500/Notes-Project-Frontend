@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import {DragDropContext} from 'react-beautiful-dnd';
 import "./App.css";
 import uuid from "react-uuid";
 import Main from "./Components/Main";
@@ -10,18 +9,23 @@ function App() {
   const [folders, setFolders] = useState([]);
   const [notes, setNotes] = useState([]);
   const [activeNote, setActiveNote] = useState(false);
+  const [tags, setTags] = useState([]);
 
   const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
 
 // INITIALIZE FETCH //
   useEffect(() => {
-    fetch("http://localhost:9292/folders/recent")
+    fetch("http://localhost:9292/folders/all/recent")
     .then(r => r.json())
     .then(folders => setFolders(folders));
 
-    fetch("http://localhost:9292/notes")
-    .then(r=> r.json())
+    fetch("http://localhost:9292/notes/all/tags")
+    .then(r => r.json())
     .then(notes => setNotes(notes));
+
+    fetch("http://localhost:9292/tags")
+    .then(r => r.json())
+    .then(tags => setTags(tags));
   }, []);
 
 
@@ -60,6 +64,8 @@ function App() {
     })
       .then(r => r.json())
       .then(newNote => {
+        // Prevent mapping error when no tags exist
+        newNote.tags = []
         setNotes([newNote, ...notes]);
         setActiveNote(newNote.id);
       })
@@ -86,6 +92,69 @@ function App() {
     setNotes(updatedNotesArr);
   };
 
+  const onAddTag = (note, tagName) => {
+    const existingTag = tags.find(tag => tag.name === tagName)
+    const alreadyTagged = note.tags.find(tag => tag.name === tagName)
+    if (!!alreadyTagged) {
+      console.log("This tag already exists")
+    }
+    else if (!!existingTag) {
+      const updatedNotesArr = [...notes]
+      updatedNotesArr.forEach(n => {
+        if (n.id === note.id) {
+          n.tags.push(existingTag)
+        }
+        return n.tags
+      })
+      fetch(`http://localhost:9292/notes/${note.id}/tags/${existingTag.id}/add`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(existingTag)
+      })
+      setNotes(updatedNotesArr)
+      setTags([...tags, existingTag])
+    }
+    else {
+      const newTag = {
+        id: uuid(),
+        name: tagName,
+      }
+      const updatedNotesArr = [...notes]
+      updatedNotesArr.forEach(n => {
+        if (n.id === note.id) {
+          n.tags.push(newTag)
+        }
+        return n.tags
+      })
+      fetch(`http://localhost:9292/notes/${note.id}/tags/${newTag.name}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newTag)
+      })
+      setNotes(updatedNotesArr)
+      setTags([...tags, newTag])
+    }
+  }
+
+  const onRemoveTag = (note, tag) => {
+    fetch(`http://localhost:9292/notes/${note.id}/tags/${tag.id}/remove`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(tag)
+    })
+    const updatedNotesArr = [...notes]
+    updatedNotesArr.forEach(note => {
+      note.tags = note.tags.filter(t => t !== tag)
+    })
+    setNotes(updatedNotesArr)
+  }
+
 // DELETE //
   const onDeleteFolder = (folderId) => {
     fetch(`http://localhost:9292/folders/notes/${folderId}`, {
@@ -110,7 +179,6 @@ function App() {
   return (
     
     <div className="App">
-    <DragDropContext>
       <Sidebar
         folders={folders}
         onAddFolder={onAddFolder}
@@ -122,10 +190,13 @@ function App() {
         onDeleteNote={onDeleteNote}
         activeNote={activeNote}
         setActiveNote={setActiveNote}
-        
+        onAddTag={onAddTag}
+        onRemoveTag={onRemoveTag}
       />
-      <Main activeNote={getActiveNote()} onUpdateNote={onUpdateNote} />
-      </DragDropContext>
+      <Main 
+        activeNote={getActiveNote()} 
+        onUpdateNote={onUpdateNote}
+      />
     </div>
     
   );

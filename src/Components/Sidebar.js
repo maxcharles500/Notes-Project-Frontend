@@ -14,6 +14,8 @@ const Sidebar = ({
   onDeleteNote,
   activeNote,
   setActiveNote,
+  onAddTag,
+  onRemoveTag
 }) => {
   const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
 
@@ -75,6 +77,8 @@ const Sidebar = ({
                 onDeleteNote={onDeleteNote}
                 activeNote={activeNote}
                 setActiveNote={setActiveNote}
+                onAddTag={onAddTag}
+                onRemoveTag={onRemoveTag}
               />
         ))}
       </DragDropContext>
