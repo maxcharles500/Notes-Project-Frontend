@@ -8,14 +8,7 @@ const Main = ({ activeNote, onUpdateNote }) => {
       [field]: value,
       updated_at: Date.now()
     }
-    fetch(`http://localhost:9292/notes/${activeNote.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedNote),
-    })
-    onUpdateNote(updatedNote);
+    onUpdateNote(activeNote, updatedNote);
   };
 
   if (!activeNote) return <div className="no-active-note">No Active Note</div>;
@@ -35,7 +28,17 @@ const Main = ({ activeNote, onUpdateNote }) => {
         />
         {/* Tags */}
         {noteTags.map(({id, name}) => (
-          <Badge key={id} bg="info">{name}</Badge>
+          <Badge 
+            key={id} 
+            bg="info" 
+            className="position-relative" 
+            style={{
+              marginRight: '5px', 
+              top: '-12px'
+            }}
+          >
+            {name}
+          </Badge>
         ))}
         <textarea
           id="body"
