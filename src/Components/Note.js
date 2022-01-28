@@ -22,12 +22,15 @@ const Note = ({
 	// Tags Modal
 	const [tagForm, setTagForm] = useState("");
 	const [showTagsModal, setShowTagsModal] = useState(false);
-	const handleCloseTagsModal = () => setShowTagsModal(false);
+	const handleCloseTagsModal = () => {
+		setShowTagsModal(false);
+		setTagForm("");
+	}
 	const handleShowTagsModal = () => setShowTagsModal(true);
 	const handleTagAdd = (e) => {
 		e.preventDefault();
 		setTagForm("");
-		onAddTag(note, tagForm);
+		onAddTag(note, tagForm.toLowerCase());
 	}
 	const handleTagRemove = (e) => {
 		const removedTag = note.tags.find(tag => tag.id === e.target.id)
@@ -35,6 +38,7 @@ const Note = ({
 	}
 
 	const noteTags = note.tags.map(tag => tag)
+	const tagsExist = !!note.tags.find(tag => tag)
 
 	// Context Menu
 	const [showMenu, setShowMenu] = useState(false);
@@ -63,7 +67,23 @@ const Note = ({
 			>
 
 			<div className="sidebar-note-title">
-				<strong>{note.title}</strong>
+				<div>
+					<strong>{note.title}</strong>
+					{/* Sidebar Tags */}
+					{noteTags.map(({id, name}) => (
+          	<Badge 
+							key={id} 
+							bg="info" 
+							className="position-relative" 
+							style={{
+								marginLeft: '5px', 
+								top: '-2px'
+							}}
+						>
+							{name}
+						</Badge>
+        	))}
+				</div>
 				<button onClick={handleShowModal}>
 					🗑️
 				</button>
@@ -84,7 +104,7 @@ const Note = ({
 				<ContextMenu top={points.y} left={points.x}>
 					<ul>
 						<li onClick={handleShowTagsModal}>Manage Tags</li>
-						<li >Delete</li>
+						<li onClick={handleShowModal}>Delete</li>
 					</ul>
 				</ContextMenu>
 			)}
@@ -93,7 +113,7 @@ const Note = ({
 				<Modal.Header closeButton>
 				<Modal.Title>{note.title}</Modal.Title>
 				</Modal.Header>
-				<Modal.Body>Are you sure you want to delete {note.title}?</Modal.Body>
+				<Modal.Body>Are you sure you want to delete {<b><i>{note.title}</i></b>}?</Modal.Body>
 				<Modal.Footer>
 				<Button variant="secondary" onClick={handleCloseModal}>
 						No, take me back!
@@ -110,10 +130,28 @@ const Note = ({
 				<Modal.Title>Tags in {note.title}</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					{/* Note Tags */}
-					{noteTags.map(({id, name}) => (
-          	<Badge key={id} id={id} bg="info" as="button" onClick={(e) => handleTagRemove(e)}>{name} X</Badge>
-        	))}
+					{/* Tags */}
+					{tagsExist ?
+					noteTags.map(({id, name}) => (
+          	<Badge 
+							key={id} 
+							id={id} 
+							bg="info" 
+							className="position-relative" 
+							style={{
+								marginRight: '5px', 
+								marginBottom: '10px',
+								marginTop: '10px',
+								bottom: '7px'
+							}} 
+							as="button" 
+							onClick={(e) => handleTagRemove(e)}
+						>
+							{name} X
+						</Badge>
+        	)) :
+					<p><i>No tags</i></p>
+					}
 					<form onSubmit={(e) => handleTagAdd(e)}>
 						<input type="text" placeholder="New Tags" value={tagForm} onChange={(e) => setTagForm(e.target.value)}/>
 					</form>
