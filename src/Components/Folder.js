@@ -54,19 +54,12 @@ const Folder = ({
 	})
 
   const handleRenameFolder = (e) => {
-		fetch(`http://localhost:9292/folders/${folder.id}`, {
-			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-			name: e.target.value
-			}),
-		})
-		onUpdateFolder({
+		const updatedFolder = {
 			...folder,
-			name: e.target.value
-		})
+			name: e.target.value,
+			updated_at: Date.now()
+		}
+		onUpdateFolder(e, folder, updatedFolder)
 	}
 
 	return (
@@ -111,7 +104,7 @@ const Folder = ({
 				>
 					<Accordion.Body>
 						{sortedNotes.map((note, i) => {
-							if (note.folder_id == folder.id) {
+							if (note.folder_id === folder.id) {
 								return (
 									<Draggable key={note.id} draggableId={note.id} index={i}>
 										{(provided) => (
@@ -133,7 +126,7 @@ const Folder = ({
 										)}
 									</Draggable>
 								)
-							}
+							} else return (null)
 						})}
 					</Accordion.Body>
 					{provided.placeholder}
@@ -148,7 +141,7 @@ const Folder = ({
 			<Modal.Header closeButton>
 			<Modal.Title>{folder.name}</Modal.Title>
 			</Modal.Header>
-			<Modal.Body>Are you sure you want to delete {folder.name} and all of its contents?</Modal.Body>
+			<Modal.Body>Are you sure you want to delete {<b><i>{folder.name}</i></b>} and {<strong>all of its contents?</strong>}</Modal.Body>
 			<Modal.Footer>
 			<Button variant="secondary" onClick={handleCloseModal}>
 					No, I regret everything!

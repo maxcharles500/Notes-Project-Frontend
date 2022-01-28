@@ -15,7 +15,8 @@ const Sidebar = ({
   activeNote,
   setActiveNote,
   onAddTag,
-  onRemoveTag
+  onRemoveTag,
+  connectionError
 }) => {
   const sortedNotes = notes.sort((a, b) => b.updated_at - a.updated_at)
 
@@ -24,9 +25,14 @@ const Sidebar = ({
     // Return if out of bounds
     if (!result.destination) return;
     const { destination, draggableId } = result;
-    // Removed conditionnal logic to organize notes based on updated_at // if (source.droppableId !== destination.droppableId) {
+    // Removed conditionnal logic of organizing notes based on DnD placement 
+    // if (source.droppableId !== destination.droppableId) {
 
       // Update note within notes array with new folder ID
+      const updatedNote = {
+        folder_id: destination.droppableId,
+        updated_at: Date.now()
+      }
       const updatedNotesArr = notes.map((note) => {
         if (note.id === draggableId) {
           return ({
@@ -37,15 +43,12 @@ const Sidebar = ({
         }
         return note;
       });
-      
       fetch(`http://localhost:9292/folders/notes/${draggableId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          folder_id: destination.droppableId
-        }),
+        body: JSON.stringify(updatedNote),
       })
       setNotes(updatedNotesArr);
     // }
@@ -60,7 +63,13 @@ const Sidebar = ({
           <Dropdown.Item>Note (I'm useless lol)</Dropdown.Item>
         </DropdownButton>
       </div>
-
+      {/* Display Connection Error Message */}
+      {connectionError ?
+        <div className="app-sidebar-error">
+          <p style={{text: 'red'}}>Connection to server failed. Changes will not be saved.</p>
+        </div> :
+        null
+      }
       <div className="app-sidebar-notes">
       <DragDropContext onDragEnd={handleOnDragEnd}>
         {/* Folders with Notes */}

@@ -52,6 +52,14 @@ button:hover {
   margin: 0;
 }
 
+.app-sidebar-error {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 25px;
+  padding-right: 25px;
+  color: red;
+}
+
 .app-sidebar-notes {
   height: calc(100vh - 78px);
   overflow-y: scroll;
